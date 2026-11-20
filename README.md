@@ -67,6 +67,12 @@ Sensitive personal and financial identifiers are masked with replacement tokens 
 
 ---
 
+### ⚙️ 3. Dynamic Manager Policy Engine (Custom DLP Rules)
+Security managers can create and manage custom DLP rules in real time directly from the **Governance Dashboard** without restarting any containers:
+
+* **Full Policy Lifecycle**: Create, edit, pause/resume (toggle), and delete custom **`BLOCK`** or **`REDACT`** rules via the dashboard, backed by `judge` REST endpoints (`GET/POST /rules`, `DELETE /rules/{id}`, `POST /rules/{id}/toggle`).
+* **Shared Persistent Storage**: Rules are persisted in `rules.json` and mounted into both `dashboard` and `judge`, so policy changes take effect immediately on the very next prompt.
+
 ## Isolated Local Dummy LLM (`dummy-llm`)
 
 To guarantee fast, offline-ready, and zero-cost demos, `judge` forwards approved and redacted prompts to an internal **`dummy-llm`** microservice (`http://dummy-llm:8001/v1/chat`):
