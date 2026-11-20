@@ -19,8 +19,6 @@ services:
     build: ./judge
     ports:
       - "8000:8000"
-    env_file:
-      - .env
     environment:
       - DATABASE_URL=postgresql://admin:secret@db:5432/shadow_ai
       - DUMMY_LLM_URL=http://dummy-llm:8001/v1/chat
@@ -82,14 +80,6 @@ services:
     networks:
       - corp_internal
       - internet
-
-  dns-blocker:
-    build: ./dnsBlocker
-    environment:
-      - ALERT_WEBHOOK_URL=http://gpt.company.com:8000/webhook/alert
-      - GATEWAY_IP=judge
-    networks:
-      - corp_internal
 
 volumes:
   pgdata:
