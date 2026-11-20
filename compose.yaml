@@ -1,0 +1,103 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: shadow_ai
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d shadow_ai"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - corp_internal
+
+  judge:
+    build: ./judge
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://admin:secret@db:5432/shadow_ai
+      - DUMMY_LLM_URL=http://dummy-llm:8001/v1/chat
+    volumes:
+      - ./rules.json:/app/rules.json
+    depends_on:
+      db:
+        condition: service_healthy
+      dummy-llm:
+        condition: service_started
+    networks:
+      corp_internal:
+        aliases:
+          - gpt.company.com
+      internet:
+      llm_net:
+
+  dummy-llm:
+    build: ./dummy_llm
+    expose:
+      - "8001"
+    networks:
+      - llm_net
+
+  host:
+    build: ./host
+    environment:
+      - GATEWAY_URL=http://gpt.company.com:8000/chat
+    depends_on:
+      - judge
+    networks:
+      - corp_internal
+
+  host-proxy:
+    image: alpine/socat
+    command: TCP-LISTEN:8501,fork,reuseaddr TCP:host:8501
+    ports:
+      - "8501:8501"
+    depends_on:
+      - host
+    networks:
+      - corp_internal
+      - internet
+
+  dashboard:
+    build: ./dashboard
+    ports:
+      - "8502:8502"
+    environment:
+      - DATABASE_URL=postgresql://admin:secret@db:5432/shadow_ai
+      - JUDGE_URL=http://judge:8000
+    volumes:
+      - ./rules.json:/app/rules.json
+    depends_on:
+      db:
+        condition: service_healthy
+      judge:
+        condition: service_started
+    networks:
+      - corp_internal
+      - internet
+
+  dns-blocker:
+    build: ./dnsBlocker
+    environment:
+      - ALERT_WEBHOOK_URL=http://gpt.company.com:8000/webhook/alert
+      - GATEWAY_IP=judge
+    networks:
+      - corp_internal
+
+volumes:
+  pgdata:
+
+networks:
+  corp_internal:
+    internal: true
+  internet:
+    driver: bridge
+  llm_net:
+    driver: bridge

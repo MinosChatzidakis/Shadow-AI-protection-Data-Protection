@@ -1,0 +1,47 @@
+[
+  {
+    "id": "rule-proj-titan",
+    "name": "Confidential Project Codename (Project Titan)",
+    "pattern": "\\b(?:Project\\s*Titan|Titan\\s*Project)\\b",
+    "action": "BLOCK",
+    "enabled": true,
+    "description": "Prevents leaks of unannounced internal projects",
+    "builtIn": false
+  },
+  {
+    "id": "rule-iban",
+    "name": "Greek IBAN Bank Account",
+    "pattern": "\\b(?:IBAN[:\\s]*)?GR\\d{2}(?:[-\\s]?[0-9A-Z]){23}\\b",
+    "action": "REDACT",
+    "enabled": true,
+    "description": "Masks Greek bank account numbers with or without spaces/dashes",
+    "builtIn": false
+  },
+  {
+    "id": "rule-any-iban",
+    "name": "European & International IBAN",
+    "pattern": "\\b(?:IBAN[:\\s]*)?[A-Z]{2}\\d{2}(?:[-\\s]?[0-9A-Z]){11,30}\\b",
+    "action": "REDACT",
+    "enabled": true,
+    "description": "Masks European and international bank account numbers with or without spaces/dashes",
+    "builtIn": false
+  },
+  {
+    "id": "rule-salary",
+    "name": "Internal Salary & Payroll Figures",
+    "pattern": "(?i)\\b(?:salary|payroll|compensation|bonus)[^\\w\\n]{1,6}(?:€|EUR|\\$)?\\s*\\d{3,}\\b",
+    "action": "REDACT",
+    "enabled": true,
+    "description": "Protects executive and employee remuneration figures",
+    "builtIn": false
+  },
+  {
+    "id": "rule-numbers-0-inf",
+    "name": "Numeric Data 0-Infinity (Any Digits)",
+    "pattern": "0-infinity",
+    "action": "REDACT",
+    "enabled": false,
+    "description": "Catches and masks any arbitrary sequence of numbers/digits from 0 to infinity",
+    "builtIn": false
+  }
+]
