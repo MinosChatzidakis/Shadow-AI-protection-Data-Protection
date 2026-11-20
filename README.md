@@ -38,9 +38,7 @@ The stack enforces strict **Separation of Concerns** and **network segmentation*
 | **`host`**        | `./host`             | `8501`              | **Employee Workstation**: Simulates a corporate laptop on the isolated `corp_internal` network. Allows employees to submit prompts to the approved gateway or attempt direct outbound shadow AI connections.                |
 | **`judge`**       | `./judge`            | `8000`              | **AI Gateway & DLP Judge**: Evaluates every incoming prompt in real time via `dlp.py`, enforces Redaction/Block rules, forwards clean prompts to the LLM, and logs incidents to PostgreSQL.                                 |
 | **`dummy-llm`**   | `./dummy_llm`        | `8001` _(internal)_ | **Local Dummy LLM**: Lightweight local mock LLM isolated on `llm_net`. Accepts sanitized prompts from `judge` (`POST /v1/chat`) and returns deterministic responses without requiring external API keys or internet access. |
-| **`db`**          | `postgres:16-alpine` | `5432`              | **Audit Database**: PostgreSQL 16 storing persistent audit records in the `incident_logs` table.                                                                                                                            |
 | **`dashboard`**   | `./dashboard`        | `8502`              | **Governance Console**: Real-time admin console featuring KPI cards, threat distribution charts, activity timeline, custom DLP rule management, prompt diff inspector, and CSV export.                                      |
-| **`dns-blocker`** | `./dnsBlocker`       | `53/udp`            | **DNS Sinkhole**: Intercepts employee DNS resolutions to blocked consumer AI domains (`chatgpt.com`, `claude.ai`) and dispatches webhook alerts to the Judge.                                                               |
 
 ---
 
